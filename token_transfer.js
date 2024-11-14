@@ -1,6 +1,6 @@
 import { getHttpEndpoint } from "@orbs-network/ton-access";
 import { mnemonicToWalletKey } from "@ton/crypto";
-import { TonClient, WalletContractV4, internal, JettonWallet, address } from "@ton/ton";
+import { Address, TonClient, WalletContractV4, internal, JettonWallet, address } from "@ton/ton";
 
 async function main() {
     const mnemonic = require('fs').readFileSync("./.mnemonic", { encoding: "utf-8" });
@@ -15,19 +15,23 @@ async function main() {
     }
     const walletContract = client.open(wallet);
     const seqno = await walletContract.getSeqno();
+    console.log(`查看Hamster合约信息`)
+    console.log(
+        await client.getContractState("kQAJ8uWd7EBqsmpSWaRdf_I-8R8-XHwh3gsNKhy-UrdrPX6i")
+    )
+    // token transfer
     await walletContract.sendTransfer({
         secretKey: key.secretKey,
         seqno: seqno,
         messages: [
             internal({
-                to: "EQA4V9tF4lY2S_J-sEQR7aUj9IwW-Ou2vJQlCn--2DLOLR5e",
-                value: "0.0005",
+                to: "kQAJ8uWd7EBqsmpSWaRdf_I-8R8-XHwh3gsNKhy-UrdrPX6i",
+                value: "0.000001",
                 body: "1111111",
                 bounce: false,
             })
         ]
-    });
-
+    })
     // wait until confirmed
     let currentSeqno = seqno;
     while (currentSeqno == seqno) {
@@ -38,7 +42,6 @@ async function main() {
     }
     console.log("transaction confirmed!");
 }
-
 main();
 
 function sleep(ms) {
